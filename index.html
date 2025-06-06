@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jacob's Aquarium Supplies - Home</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+    .banner {
+      background-color: #008cba;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      position: relative;
+    }
+    .cart {
+      position: absolute;
+      right: 20px;
+      top: 15px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .cart-count {
+      background: red;
+      color: white;
+      font-size: 12px;
+      border-radius: 50%;
+      padding: 2px 6px;
+      margin-left: 5px;
+    }
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f2f2f2;
+      padding: 10px 20px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      transition: text-shadow 0.3s ease;
+    }
+    .nav-links a.active {
+      color: #008cba;
+      text-shadow:
+        0 0 5px #00bfff,
+        0 0 10px #00bfff,
+        0 0 20px #00bfff;
+    }
+    .search-bar input {
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      min-width: 150px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+      padding: 20px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .product-box {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .product-box img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    .product-box h3 {
+      margin: 10px 0 5px 0;
+      font-size: 14px;
+    }
+    .product-box p {
+      margin: 0 0 10px 0;
+      font-size: 13px;
+      color: #555;
+    }
+    .add-btn {
+      padding: 6px 12px;
+      background-color: #008cba;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .cart-drawer {
+      position: fixed;
+      top: 60px;
+      right: 0;
+      background: white;
+      width: 280px;
+      height: 100%;
+      border-left: 1px solid #ccc;
+      padding: 10px;
+      display: none;
+      flex-direction: column;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    .cart-drawer h3 {
+      margin-top: 0;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 8px;
+    }
+    .cart-item {
+      border-bottom: 1px solid #eee;
+      padding: 8px 5px;
+      font-size: 14px;
+    }
+    @media (max-width: 900px) {
+      .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 480px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+      .navbar {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .search-bar input {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="banner">
+    Jacob's Aquarium Supplies
+    <div class="cart" onclick="toggleCart(event)">
+      🛒 Cart <span class="cart-count" id="cart-count">0</span>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="products.html">Products</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search products..." oninput="filterProducts()" />
+    </div>
+  </div>
+
+  <div class="cart-drawer" id="cart-drawer">
+    <h3>Your Cart</h3>
+    <div id="cart-items"></div>
+  </div>
+
+  <div class="product-grid" id="product-grid"></div>
+
+  <script>
+    const placeholderImage = 'IMG_5612.png'; // your placeholder image path
+
+    // Original home page products - aquarium fertilizers
+    const products = [
+      { id: 1, name: 'Aquarium Fertilizer 1', price: '$10', image: placeholderImage },
+      { id: 2, name: 'Aquarium Fertilizer 2', price: '$12', image: placeholderImage },
+      { id: 3, name: 'Aquarium Fertilizer 3', price: '$11', image: placeholderImage },
+      { id: 4, name: 'Aquarium Fertilizer 4', price: '$14', image: placeholderImage },
+      { id: 5, name: 'Aquarium Fertilizer 5', price: '$13', image: placeholderImage },
+      { id: 6, name: 'Aquarium Fertilizer 6', price: '$15', image: placeholderImage },
+      { id: 7, name: 'Aquarium Fertilizer 7', price: '$9', image: placeholderImage },
+      { id: 8, name: 'Aquarium Fertilizer 8', price: '$16', image: placeholderImage },
+      { id: 9, name: 'Aquarium Fertilizer 9', price: '$12', image: placeholderImage },
+      { id: 10, name: 'Aquarium Fertilizer 10', price: '$14', image: placeholderImage },
+      { id: 11, name: 'Aquarium Fertilizer 11', price: '$10', image: placeholderImage },
+      { id: 12, name: 'Aquarium Fertilizer 12', price: '$12', image: placeholderImage },
+      { id: 13, name: 'Aquarium Fertilizer 13', price: '$11', image: placeholderImage },
+      { id: 14, name: 'Aquarium Fertilizer 14', price: '$14', image: placeholderImage },
+      { id: 15, name: 'Aquarium Fertilizer 15', price: '$13', image: placeholderImage },
+      { id: 16, name: 'Aquarium Fertilizer 16', price: '$15', image: placeholderImage },
+      { id: 17, name: 'Aquarium Fertilizer 17', price: '$9', image: placeholderImage },
+      { id: 18, name: 'Aquarium Fertilizer 18', price: '$16', image: placeholderImage },
+      { id: 19, name: 'Aquarium Fertilizer 19', price: '$12', image: placeholderImage },
+      { id: 20, name: 'Aquarium Fertilizer 20', price: '$14', image: placeholderImage },
+    ];
+
+    const productGrid = document.getElementById('product-grid');
+    const searchInput = document.getElementById('search-input');
+    const cartCount = document.getElementById('cart-count');
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartItemsContainer = document.getElementById('cart-items');
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function saveCart() {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    function updateCartUI() {
+      cartCount.textContent = cart.length;
+      if(cart.length === 0){
+        cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+      } else {
+        cartItemsContainer.innerHTML = cart.map(item => `
+          <div class="cart-item">${item.name}</div>
+        `).join('');
+      }
+    }
+
+    function toggleCart(e) {
+      e.stopPropagation();
+      if (cartDrawer.style.display === 'flex') {
+        cartDrawer.style.display = 'none';
+      } else {
+        cartDrawer.style.display = 'flex';
+      }
+    }
+
+    // Close cart if clicking outside
+    document.addEventListener('click', (e) => {
+      if (!cartDrawer.contains(e.target) && !e.target.closest('.cart')) {
+        cartDrawer.style.display = 'none';
+      }
+    });
+
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        cart.push(product);
+        saveCart();
+        updateCartUI();
+      }
+    }
+
+    function renderProducts(items) {
+      productGrid.innerHTML = items.map(p => `
+        <div class="product-box">
+          <img src="${p.image || placeholderImage}" alt="${p.name}" />
+          <h3>${p.name}</h3>
+          <p>${p.price}</p>
+          <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+        </div>
+      `).join('');
+    }
+
+    function filterProducts() {
+      const term = searchInput.value.trim().toLowerCase();
+      if (!term) {
+        renderProducts(products);
+        return;
+      }
+      const filtered = products.filter(p => p.name.toLowerCase().includes(term));
+      renderProducts(filtered);
+    }
+
+    // Initial load
+    updateCartUI();
+    renderProducts(products);
+  </script>
+
+</body>
+</html>
