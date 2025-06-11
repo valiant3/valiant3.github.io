@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="banner">
+    Jacob's Aquarium Supplies
+    <div class="cart" onclick="toggleCart()">
+      🛒 Cart <span class="cart-count" id="cart-count">0</span>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="products.html" class="active">Products</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search..." id="search-input">
+    </div>
+  </div>
+
+  <div class="cart-drawer" id="cart-drawer">
+    <h3>Your Cart</h3>
+    <div id="cart-items"></div>
+    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+  </div>
+
+  <div class="product-list" id="product-list"></div>
+
+  <script>
+    const productList = document.getElementById('product-list');
+    const cartItems = document.getElementById('cart-items');
+    const cartCount = document.getElementById('cart-count');
+    const cartDrawer = document.getElementById('cart-drawer');
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    const products = [
+      { name: "Nutrient Bundle", image: "pictures/Bundle.jpg" },
+	  { name: "Decoration", image: "pictures/3D.jpg" },
+	  { name: "Root Tabs", image: "pictures/Tabs.jpg" },
+	  { name: "Pike Killifish", image: "pictures/Pike.jpg" },
+	  { name: "Aquaponic System", image: "pictures/AQ_Mock.jpg" },
+	  { name: "Cherry Shrimp", image: "pictures/Cherry.jpg" },
+	  { name: "Dwarf Sagittaria", image: "pictures/Dwarf.jpg" },
+	  { name: "Melanistic Mosquitofish", image: "pictures/Melanistic.jpg" },
+	  { name: "Capsules", image: "pictures/Capsules.jpg" },
+	  { name: "Aquarium Plant", image: "pictures/Plant.jpg" },
+	  { name: "Baby Pike", image: "pictures/Baby_Pike.jpg" },
+	  { name: "Mosquitofish", image: "pictures/Mosquito.jpg" },
+	  { name: "Fish Food", image: "pictures/pellet.jpg" },
+      { name: "Water Conditioner", image: "pictures/conditioner.jpg" },
+      { name: "Tank Cleaner", image: "pictures/cleaner.jpg" },
+      { name: "Aquarium Light", image: "pictures/aquariumlight.jpg" },
+      { name: "Heater", image: "pictures/heater.jpg" },
+      { name: "Gravel Vacuum", image: "pictures/vacuum.jpg" },
+      { name: "Aquarium Plants", image: "pictures/plants.jpg" },
+      { name: "Filter Media", image: "pictures/filtermedia.jpg" },
+      { name: "CO2 Kit", image: "pictures/co2kit.jpg" },
+      { name: "Digital Thermometer", image: "pictures/thermometer.jpg" }
+    ];
+
+    function updateCart() {
+      cartCount.textContent = cart.length;
+      cartItems.innerHTML = cart.map((item, index) =>
+        `<div class="cart-item">
+          ${item}
+          <span class="remove-btn" onclick="removeFromCart(${index})">&times;</span>
+        </div>`
+      ).join('');
+    }
+
+    function addToCart(name) {
+      cart.push(name);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function toggleCart() {
+      cartDrawer.style.display = cartDrawer.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function checkout() {
+      alert("Checkout not implemented.");
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!cartDrawer.contains(e.target) && !e.target.closest('.cart')) {
+        cartDrawer.style.display = 'none';
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateCart();
+      products.forEach(product => {
+        const item = document.createElement('div');
+        item.className = 'product';
+        item.innerHTML = `
+          <a href="product.html?name=${encodeURIComponent(product.name)}&image=${encodeURIComponent(product.image)}">
+            <img src="${product.image}" alt="${product.name}">
+          </a>
+          <div class="product-name">${product.name}</div>
+          <button class="add-btn" onclick="addToCart('${product.name}')">Add to Cart</button>
+        `;
+        productList.appendChild(item);
+      });
+    });
+  </script>
+
+</body>
+</html>
+
