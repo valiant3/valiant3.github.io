@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Details</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="banner">
+    Jacob's Aquarium Supplies
+    <div class="cart" onclick="toggleCart()">
+      🛒 Cart <span class="cart-count" id="cart-count">0</span>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search..." id="search-input">
+    </div>
+  </div>
+
+  <div class="cart-drawer" id="cart-drawer">
+    <h3>Your Cart</h3>
+    <div id="cart-items"></div>
+    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+  </div>
+
+  <div class="product-showcase" id="product-showcase"></div>
+
+  <script>
+    const cartItems = document.getElementById('cart-items');
+    const cartCount = document.getElementById('cart-count');
+    const cartDrawer = document.getElementById('cart-drawer');
+    const showcase = document.getElementById('product-showcase');
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function updateCart() {
+      cartCount.textContent = cart.length;
+      cartItems.innerHTML = cart.map((item, index) =>
+        `<div class="cart-item">
+          ${item}
+          <span class="remove-btn" onclick="removeFromCart(${index})">&times;</span>
+        </div>`
+      ).join('');
+    }
+
+    function addToCart(name) {
+      cart.push(name);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function toggleCart() {
+      cartDrawer.style.display = cartDrawer.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function checkout() {
+      alert("Checkout not implemented.");
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!cartDrawer.contains(e.target) && !e.target.closest('.cart')) {
+        cartDrawer.style.display = 'none';
+      }
+    });
+
+    function getProductDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get("name") || "Unknown Product";
+      const image = params.get("image") || "IMG_5612.png";
+
+      showcase.innerHTML = `
+        <button onclick="history.back()" class="back-button">← Back</button>
+        <img src="${image}" alt="${name}">
+        <div class="product-info">
+          <h2>${name}</h2>
+          <p>This is a great product to enhance your aquarium health and beauty. Provides nutrients and keeps water conditions stable.</p>
+          <button class="add-btn" onclick="addToCart('${name}')">Add to Cart</button>
+        </div>
+      `;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateCart();
+      getProductDetails();
+    });
+  </script>
+
+</body>
+</html>
